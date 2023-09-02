@@ -18,6 +18,4 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 Other contributions
 -------------------
 
-Hilbert.java is licensed on Apache 2.0 terms by Brandon Liu and based on PD code from https://github.com/rawrunprotected/hilbert_curves/blob/master/hilbert_curves.cpp
-
 VarInt.java is licensed on Apache 2.0 terms by Google LLC
