@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 public final class Util {
 
@@ -24,7 +24,7 @@ public final class Util {
      * @return either the original buffer is no de-compression is needed or the de-compressed data
      * @throws IOException if de-compressing goes wrong
      */
-    static ByteBuffer decompress(@Nonnull ByteBuffer buffer, byte compression) throws IOException {
+    static ByteBuffer decompress(@NotNull ByteBuffer buffer, byte compression) throws IOException {
         if (compression != Constants.COMPRESSION_NONE) {
             try (ByteArrayInputStream bis = new ByteArrayInputStream(buffer.array())) {
                 switch (compression) {
@@ -49,8 +49,8 @@ public final class Util {
      * @return a ByteBuffer with the contents of the InputStream
      * @throws IOException if reading or writing fails
      */
-    @Nonnull
-    private static ByteBuffer copy(@Nonnull InputStream is) throws IOException {
+    @NotNull
+    private static ByteBuffer copy(@NotNull InputStream is) throws IOException {
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             byte[] temp = new byte[1024];
             int len;

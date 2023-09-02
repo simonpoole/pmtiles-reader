@@ -12,8 +12,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Simple PMTiles reader
@@ -85,7 +85,7 @@ public class Reader implements AutoCloseable {
          * @param fis the input stream
          * @throws IOException if reading fails
          */
-        void read(@Nonnull FileInputStream fis) throws IOException {
+        void read(@NotNull FileInputStream fis) throws IOException {
             byte[] headerBuffer = new byte[Header.LENGTH];
             int count = fis.read(headerBuffer);
             if (count != headerBuffer.length) {
@@ -157,7 +157,7 @@ public class Reader implements AutoCloseable {
          * @param compression the internal compression method
          * @throws IOException if reading fails
          */
-        void read(@Nonnull FileInputStream fis, long offset, long length, byte compression) throws IOException {
+        void read(@NotNull FileInputStream fis, long offset, long length, byte compression) throws IOException {
             ByteBuffer dirBuffer = ByteBuffer.allocate((int) length);
 
             channel = fis.getChannel();
@@ -210,7 +210,7 @@ public class Reader implements AutoCloseable {
          * @throws IOException if reading the tile fails
          */
         @Nullable
-        byte[] findTile(@Nonnull Header header, long id) throws IOException {
+        byte[] findTile(@NotNull Header header, long id) throws IOException {
             int index = Arrays.binarySearch(ids, id);
             if (index >= 0) {
                 long runLength = runLengths[index];
@@ -250,7 +250,7 @@ public class Reader implements AutoCloseable {
          * @throws IOException if reading the leaf directory or the tile fails
          */
         @Nullable
-        private byte[] findTileInLeaf(@Nonnull Header header, long id, int dirIndex) throws IOException {
+        private byte[] findTileInLeaf(@NotNull Header header, long id, int dirIndex) throws IOException {
             // leaf directory
             synchronized (leafCache) {
                 final long leafId = ids[dirIndex];
@@ -273,7 +273,7 @@ public class Reader implements AutoCloseable {
          * @return a "tile" or null
          * @throws IOException if reading the leaf directory or the tile fails
          */
-        private byte[] readTile(@Nonnull Header header, int dirIndex) throws IOException {
+        private byte[] readTile(@NotNull Header header, int dirIndex) throws IOException {
             final long tileLength = lengths[dirIndex];
             if (tileLength > Integer.MAX_VALUE) {
                 throw new UnsupportedOperationException("Currently tiles larger than Integer.MAX_VALUE are not supported");
@@ -321,7 +321,7 @@ public class Reader implements AutoCloseable {
      * @param file the PMTiles file
      * @throws IOException on read errors and similar issues
      */
-    public Reader(@Nonnull File file) throws IOException {
+    public Reader(@NotNull File file) throws IOException {
         fis = new FileInputStream(file);
         header.read(fis);
         root.read(fis, header.rootDirOffset, header.rootDirLength, header.internalCompression);
@@ -414,7 +414,7 @@ public class Reader implements AutoCloseable {
      * @return a String containing the JSON format metadata
      * @throws IOException if extracting the data fails
      */
-    @Nonnull
+    @NotNull
     public String getMetadata() throws IOException {
         final int length = (int) header.metadataLength;
         ByteBuffer buffer = ByteBuffer.allocate(length);
