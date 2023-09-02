@@ -6,7 +6,9 @@ Small library to retrieve tiles from a PMTiles format file. The library attempts
 
 ## Usage
 
-        try {
+        try (Reader reader = new Reader(new File("a_file"))) {
+            byte[] tile = reader.getTile(19, 1, 1);
+            ...  
         }
     
 ## Including in your project
@@ -23,6 +25,6 @@ You can either download the jar from github or add the following to your build.g
 	
 	dependencies {
 	    ...
-	    compile 'ch.poole. ...'
+	    implementation 'ch.poole.geo.pmtiles-reader:Reader:0.1.0'
 	    ...
 	}

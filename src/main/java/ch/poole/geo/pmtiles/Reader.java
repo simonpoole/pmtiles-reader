@@ -25,6 +25,10 @@ import org.jetbrains.annotations.Nullable;
  *
  */
 public class Reader implements AutoCloseable {
+    
+    /**
+     * Sole supported pmtiles version for now
+     */
     public static final byte PMTILES_VERSION = 3;
 
     static class Header {
@@ -346,7 +350,7 @@ public class Reader implements AutoCloseable {
     /**
      * Get the tile compression used
      * 
-     * Note that we do not attempt to de-compress tiles and leave that to the callign application
+     * Note that we do not attempt to de-compress tiles and leave that to the calling application
      * 
      * @return a byte value identifying the compression in use
      */

@@ -1,0 +1,52 @@
+name: Java Lib CI
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    env:
+       # Needed to get some information about the pull request, if any
+       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+       # SonarCloud access token should be generated from https://sonarcloud.io/account/security/
+       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Dummy gradle.properties
+      shell: bash
+      run: |
+         mkdir -p ~/.gradle/
+         echo "GRADLE_USER_HOME=$HOME/.gradle" >> $GITHUB_ENV
+         echo ossrhUsername=dummy > ~/.gradle/gradle.properties
+         echo ossrhPassword=dummy >> ~/.gradle/gradle.properties  
+    - name: Build with Gradle
+      run: ./gradlew assemble
+    - name: Run unit tests
+      run: ./gradlew test
+    - name: Run coverage gen
+      run: ./gradlew jacocoTestReport
+    - name: Upload Test Results
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v2
+      with:
+         name: Test output
+         path: /home/runner/work/pmtiles-reader/pmtiles-reader/build/reports/tests/test/
+    - name: Run coverage gen
+      run: ./gradlew jacocoTestReport
+    - name: SonarCloud Scan
+      # only do this step if we have a token for sonar
+      if: ${{ env.SONAR_TOKEN }}
+      run: ./gradlew sonarqube -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=simonpoole-github --info
