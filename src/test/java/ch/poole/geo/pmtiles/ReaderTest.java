@@ -33,7 +33,7 @@ public class ReaderTest {
         try (Reader reader = new Reader(testFile1)) {
             assertEquals(Reader.PMTILES_VERSION, reader.header.version);
             assertEquals(Constants.COMPRESSION_GZIP, reader.header.internalCompression);
-            assertEquals(Constants.COMPRESSION_NONE, reader.tileCompression());
+            assertEquals(Constants.COMPRESSION_NONE, reader.getTileCompression());
             assertEquals(Constants.TYPE_PNG, reader.getTileType());
             assertEquals(0, reader.getMinZoom());
             assertEquals(3, reader.getMaxZoom());

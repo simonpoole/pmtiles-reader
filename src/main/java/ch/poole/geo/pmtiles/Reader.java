@@ -354,7 +354,7 @@ public class Reader implements AutoCloseable {
      * 
      * @return a byte value identifying the compression in use
      */
-    public byte tileCompression() {
+    public byte getTileCompression() {
         return header.tileCompression;
     }
 
