@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipInputStream;
+import java.util.zip.InflaterInputStream;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +32,7 @@ public final class Util {
                     buffer = copy(new GZIPInputStream(bis));
                     break;
                 case Constants.COMPRESSION_ZSTD:
-                    buffer = copy(new ZipInputStream(bis));
+                    buffer = copy(new InflaterInputStream(bis));
                     break;
                 default:
                     throw new UnsupportedOperationException("Internal compression " + compression + " not supported");
