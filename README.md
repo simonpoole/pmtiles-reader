@@ -13,9 +13,18 @@ Small library to retrieve tiles from a PMTiles format file. The library attempts
     
 As caching all leaf directories (the root directory is always retained) can potentially exhaust the java heap, you can adjust the maximum number of leaf directories held in the cache with
 
-    reader.setLeafDirectoryCacheSize(size);
+        reader.setLeafDirectoryCacheSize(size);
     
 the default value is currently 20.
+
+To read from a remote resource via HTTP range requests you need to provide a FileChannel that provides a wrapper around your HTTP implementation, a sample based on HttpURLConnection is included. A similar approach can be used for other HTTP implementations or other network protocols.
+
+Example:
+
+        try (Reader reader = new Reader(new UrlFileChannel("https://r2-public.protomaps.com/protomaps-sample-datasets/overture-pois.pmtiles"))) {
+            byte[] tile = reader.getTile(19, 1, 1);
+            ...  
+        }
 
 ## Limitations and other noteworthy points
 
@@ -41,6 +50,6 @@ You can either download the jar from github or add the following to your build.g
 	
 	dependencies {
 	    ...
-	    implementation 'ch.poole.geo.pmtiles-reader:Reader:0.1.1'
+	    implementation 'ch.poole.geo.pmtiles-reader:Reader:0.2.0'
 	    ...
 	}

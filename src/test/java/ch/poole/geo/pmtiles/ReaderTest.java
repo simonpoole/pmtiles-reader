@@ -17,7 +17,6 @@ public class ReaderTest {
     File testFile1;
     File testFile2;
     File testFile3;
-    // File testFile4;
 
     @Before
     public void setup() {
@@ -25,7 +24,6 @@ public class ReaderTest {
         testFile1 = new File(classLoader.getResource("stamen_toner(raster)CC-BY+ODbL_z3.pmtiles").getFile());
         testFile2 = new File(classLoader.getResource("usgs-mt-whitney-8-15-webp-512.pmtiles").getFile());
         testFile3 = new File(classLoader.getResource("protomaps(vector)ODbL_firenze.pmtiles").getFile());
-        // testFile4 = new File(classLoader.getResource("overture-pois.pmtiles").getFile());
     }
 
     @Test
@@ -117,31 +115,14 @@ public class ReaderTest {
                 (byte) 0xf4, (byte) 0x1f, (byte) 0x49, (byte) 0xce, (byte) 0xc1, (byte) 0xef, (byte) 0x23, (byte) 0x84 });
     }
 
-    @Test 
+    @Test
     public void metaData() {
         try (Reader reader = new Reader(testFile1)) {
             String meta = reader.getMetadata();
             assertEquals("{}", meta);
-        } catch (IOException  e) {
+        } catch (IOException e) {
             fail(e.getMessage());
             e.printStackTrace();
         }
     }
-    
-//    @Test
-//    public void getAllTiles() {
-//        try (Reader reader = new Reader(testFile4)) {
-//            for (int z = reader.getMinZoom(); z <= reader.getMaxZoom(); z++) {
-//                final int maxCoord = 1 << z;
-//                for (int x = 0; x < maxCoord; x++) {
-//                    for (int y = 0; y < maxCoord; y++) {
-//                        reader.getTile(z, x, y);
-//                    }
-//                }
-//            }
-//        } catch (IOException e) {
-//            fail(e.getMessage());
-//            e.printStackTrace();
-//        }
-//    }
 }

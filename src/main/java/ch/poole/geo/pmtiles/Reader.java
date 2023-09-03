@@ -32,7 +32,7 @@ public class Reader implements AutoCloseable {
     public static final byte PMTILES_VERSION = 3;
 
     static class Header {
-        private static final int    LENGTH                      = 128;
+        private static final int    LENGTH                      = 127;
         private static final byte[] MAGIC                       = new byte[] { 0x50, 0x4D, 0x54, 0x69, 0x6C, 0x65, 0x73 };
         private static final int    VERSION_OFFSET              = 7;
         byte                        version;                                                                              // NOSONAR
@@ -169,6 +169,7 @@ public class Reader implements AutoCloseable {
          */
         void read(@NotNull FileChannel channel, long offset, long length, byte compression) throws IOException {
             ByteBuffer dirBuffer = ByteBuffer.allocate((int) length);
+            dirBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
             int count = channel.read(dirBuffer, offset);
             if (count != length) {
@@ -325,14 +326,27 @@ public class Reader implements AutoCloseable {
     private List<Long>                tileCount = new ArrayList<>();
 
     /**
-     * Construct a new Reader
+     * Construct a new Reader instance
      * 
      * @param file the PMTiles file
      * @throws IOException on read errors and similar issues
      */
     @SuppressWarnings("resource")
     public Reader(@NotNull File file) throws IOException {
-        channel = new FileInputStream(file).getChannel(); // NOSONAR closing the channel will close the stream
+        this(new FileInputStream(file).getChannel()); // NOSONAR closing the channel will close the stream
+    }
+
+    /**
+     * Construct a new instance from a FileChannel
+     * 
+     * Note that while we only need the functionality of SeekableByteChannel this doesn't exist on Android prior to api
+     * level 24 (Android 7.0)
+     * 
+     * @param channel the FileChannel
+     * @throws IOException if we cannot read from the channel
+     */
+    public Reader(@NotNull FileChannel channel) throws IOException {
+        this.channel = channel;
         header.read(channel);
         root.read(channel, header.rootDirOffset, header.rootDirLength, header.internalCompression);
         tileCount.add(0L);
