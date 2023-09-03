@@ -41,6 +41,6 @@ You can either download the jar from github or add the following to your build.g
 	
 	dependencies {
 	    ...
-	    implementation 'ch.poole.geo.pmtiles-reader:Reader:0.1.0'
+	    implementation 'ch.poole.geo.pmtiles-reader:Reader:0.1.1'
 	    ...
 	}
