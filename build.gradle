@@ -23,6 +23,8 @@ ext {
     spdxId = 'BSD 3-Clause'
 }
 
+version = project.ext.version
+
 jacocoTestReport {
     reports {
         xml.required=true
