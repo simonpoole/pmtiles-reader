@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  *
  */
 public class Reader implements AutoCloseable {
-    
+
     /**
      * Sole supported pmtiles version for now
      */
@@ -47,18 +47,24 @@ public class Reader implements AutoCloseable {
         private static final int    LEAF_DIR_OFFSET_OFFSET      = 40;
         private long                leafDirOffset;
         private static final int    LEAF_DIR_LENGTH_OFFSET      = 48;
+        @SuppressWarnings("unused")
         private long                leafDirLength;
         private static final int    TILE_DATA_OFFSET_OFFSET     = 56;
         private long                tileDataOffset;
         private static final int    TILE_DATA_LENGTH_OFFSET     = 64;
+        @SuppressWarnings("unused")
         private long                tileDataLength;
         private static final int    ADDRESSED_TILES_OFFSET      = 72;
+        @SuppressWarnings("unused")
         private long                addressedTiles;
         private static final int    TILE_ENTRIES_OFFSET         = 80;
+        @SuppressWarnings("unused")
         private long                tileEntries;
         private static final int    TILE_CONTENTS_OFFSET        = 88;
+        @SuppressWarnings("unused")
         private long                tileContents;
         private static final int    CLUSTERED_OFFSET            = 96;
+        @SuppressWarnings("unused")
         private byte                clustered;
         private static final int    INTERNAL_COMPRESSION_OFFSET = 97;
         byte                        internalCompression;
@@ -89,13 +95,15 @@ public class Reader implements AutoCloseable {
          * @param fis the input stream
          * @throws IOException if reading fails
          */
-        void read(@NotNull FileInputStream fis) throws IOException {
-            byte[] headerBuffer = new byte[Header.LENGTH];
-            int count = fis.read(headerBuffer);
-            if (count != headerBuffer.length) {
+        void read(@NotNull FileChannel channel) throws IOException {
+            ByteBuffer buffer = ByteBuffer.allocate(LENGTH).order(ByteOrder.LITTLE_ENDIAN);
+
+            int count = channel.read(buffer);
+            if (count != LENGTH) {
                 throw new IOException("Incomplete header");
             }
-            ByteBuffer buffer = ByteBuffer.wrap(headerBuffer).order(ByteOrder.LITTLE_ENDIAN);
+
+            buffer.position(0);
             byte[] magic = new byte[VERSION_OFFSET];
             buffer.get(magic);
             if (!Arrays.equals(MAGIC, magic)) {
@@ -150,21 +158,18 @@ public class Reader implements AutoCloseable {
         long[] lengths;
         long[] offsets;
 
-        private FileChannel channel;
-
         /**
          * Read the directory contents from the input stream
          * 
-         * @param fis a FileInputStream
+         * @param channel a FileChannel
          * @param offset the offset the data is in the file
          * @param length the length of the data
          * @param compression the internal compression method
          * @throws IOException if reading fails
          */
-        void read(@NotNull FileInputStream fis, long offset, long length, byte compression) throws IOException {
+        void read(@NotNull FileChannel channel, long offset, long length, byte compression) throws IOException {
             ByteBuffer dirBuffer = ByteBuffer.allocate((int) length);
 
-            channel = fis.getChannel();
             int count = channel.read(dirBuffer, offset);
             if (count != length) {
                 throw new IOException("directory incomplete read " + count + " bytes of " + length); // NOSONAR
@@ -262,7 +267,7 @@ public class Reader implements AutoCloseable {
                 if (leaf == null) {
 
                     leaf = new Directory();
-                    leaf.read(fis, header.leafDirOffset + offsets[dirIndex], lengths[dirIndex], header.internalCompression);
+                    leaf.read(channel, header.leafDirOffset + offsets[dirIndex], lengths[dirIndex], header.internalCompression);
                     leafCache.put(leafId, leaf);
                 }
                 return leaf.findTile(header, id);
@@ -313,7 +318,7 @@ public class Reader implements AutoCloseable {
         }
     }
 
-    private final FileInputStream     fis;
+    private final FileChannel         channel;
     Header                            header    = new Header();
     private Directory                 root      = new Directory();
     private DirCache<Long, Directory> leafCache = new DirCache<>();
@@ -325,10 +330,11 @@ public class Reader implements AutoCloseable {
      * @param file the PMTiles file
      * @throws IOException on read errors and similar issues
      */
+    @SuppressWarnings("resource")
     public Reader(@NotNull File file) throws IOException {
-        fis = new FileInputStream(file);
-        header.read(fis);
-        root.read(fis, header.rootDirOffset, header.rootDirLength, header.internalCompression);
+        channel = new FileInputStream(file).getChannel(); // NOSONAR closing the channel will close the stream
+        header.read(channel);
+        root.read(channel, header.rootDirOffset, header.rootDirLength, header.internalCompression);
         tileCount.add(0L);
     }
 
@@ -423,7 +429,6 @@ public class Reader implements AutoCloseable {
         final int length = (int) header.metadataLength;
         ByteBuffer buffer = ByteBuffer.allocate(length);
 
-        FileChannel channel = fis.getChannel();
         int count = channel.read(buffer, header.metadataOffset);
         if (count != length) {
             throw new IOException("directory incomplete read " + count + " bytes of " + length);
@@ -443,7 +448,7 @@ public class Reader implements AutoCloseable {
 
     @Override
     public void close() throws IOException {
-        fis.close();
+        channel.close();
     }
 
     /**
