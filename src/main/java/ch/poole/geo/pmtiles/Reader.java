@@ -1,5 +1,6 @@
 package ch.poole.geo.pmtiles;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  * @author simon
  *
  */
-public class Reader implements AutoCloseable {
+public class Reader implements AutoCloseable, Closeable {
 
     /**
      * Sole supported pmtiles version for now
@@ -98,7 +99,7 @@ public class Reader implements AutoCloseable {
         void read(@NotNull FileChannel channel) throws IOException {
             ByteBuffer buffer = ByteBuffer.allocate(LENGTH).order(ByteOrder.LITTLE_ENDIAN);
 
-            int count = channel.read(buffer);
+            int count = channel.read(buffer, 0);
             if (count != LENGTH) {
                 throw new IOException("Incomplete header");
             }
@@ -347,9 +348,19 @@ public class Reader implements AutoCloseable {
      */
     public Reader(@NotNull FileChannel channel) throws IOException {
         this.channel = channel;
+        init(channel);
+        tileCount.add(0L);
+    }
+
+    /**
+     * Read the header and root directory
+     * 
+     * @param channel the FileChannel to use
+     * @throws IOException if reading fails
+     */
+    private void init(@NotNull FileChannel channel) throws IOException {
         header.read(channel);
         root.read(channel, header.rootDirOffset, header.rootDirLength, header.internalCompression);
-        tileCount.add(0L);
     }
 
     /**
@@ -363,8 +374,13 @@ public class Reader implements AutoCloseable {
      */
     @Nullable
     public byte[] getTile(int zoom, int x, int y) throws IOException {
-        long id = Hilbert.zxyToIndex(zoom, x, y) + getZoomOffset(zoom);
-        return root.findTile(header, id);
+        try {
+            long id = Hilbert.zxyToIndex(zoom, x, y) + getZoomOffset(zoom);
+            return root.findTile(header, id);
+        } catch (SourceChangedException sce) {
+            init(channel);
+            return getTile(zoom, x, y);
+        }
     }
 
     /**

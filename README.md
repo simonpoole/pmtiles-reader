@@ -21,7 +21,7 @@ To read from a remote resource via HTTP range requests you need to provide a Fil
 
 Example:
 
-        try (Reader reader = new Reader(new UrlFileChannel("https://r2-public.protomaps.com/protomaps-sample-datasets/overture-pois.pmtiles"))) {
+        try (Reader reader = new Reader(new HttpURLConnectionChannel("https://r2-public.protomaps.com/protomaps-sample-datasets/overture-pois.pmtiles"))) {
             byte[] tile = reader.getTile(19, 1, 1);
             ...  
         }
@@ -34,7 +34,7 @@ Example:
     
     reader.getTileCompression();
   
-  will indicate the required de-compression method.
+  will indicate the required de-compression method. The advantage of this is that the library doesn't require any 3rd party runtime dependencies.
     
 ## Including in your project
 
@@ -50,6 +50,6 @@ You can either download the jar from github or add the following to your build.g
 	
 	dependencies {
 	    ...
-	    implementation 'ch.poole.geo.pmtiles-reader:Reader:0.2.0'
+	    implementation 'ch.poole.geo.pmtiles-reader:Reader:0.3.0'
 	    ...
 	}

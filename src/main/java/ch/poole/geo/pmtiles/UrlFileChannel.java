@@ -1,9 +1,6 @@
 package ch.poole.geo.pmtiles;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -11,26 +8,20 @@ import java.nio.channels.FileLock;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
- * Wrapper around an HttpURLConnection to implement a read-only FileChannel
+ * Abstract wrapper around a HTTP connection to implement a read-only FileChannel
  * 
  * @author simon
  *
  */
-public class UrlFileChannel extends FileChannel {
+public abstract class UrlFileChannel extends FileChannel {
 
-    private static final String RANGE_HEADER = "Range";
+    protected static final String RANGE_HEADER = "Range";
+    protected static final String ETAG_HEADER  = "ETag";
 
     private static final String OPERATION_NOT_SUPPORTED = "Operation not supported";
 
-    private long      position = 0;
-    private final URL url;
-
-    public UrlFileChannel(@NotNull URL url) {
-        this.url = url;
-    }
+    private long position = 0;
 
     @Override
     public int read(ByteBuffer dst) throws IOException {
@@ -40,23 +31,7 @@ public class UrlFileChannel extends FileChannel {
     }
 
     @Override
-    public int read(ByteBuffer dst, long pos) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setInstanceFollowRedirects(true);
-        final int capacity = dst.capacity();
-        conn.setRequestProperty(RANGE_HEADER, "bytes=" + pos + "-" + (pos + capacity - 1));
-        try (InputStream is = conn.getInputStream()) {
-            dst.rewind();
-            int offset = 0;
-            int count = 0;
-            int remaining = capacity;
-            while (remaining > 0 && (count = is.read(dst.array(), offset, remaining)) != -1) {
-                remaining -= count;
-                offset += count;
-            }
-            return capacity - remaining;
-        }
-    }
+    public abstract int read(ByteBuffer dst, long pos) throws IOException;
 
     @Override
     public long read(ByteBuffer[] dsts, int offset, int length) throws IOException {

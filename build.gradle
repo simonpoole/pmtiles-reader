@@ -18,8 +18,8 @@ java {
 }
 
 ext {
-    version = "0.2.0"
-    repoUrl = 'https://github.com/simonpoole/JosmTemplateParser.git'
+    version = "0.3.0"
+    repoUrl = 'https://github.com/simonpoole/pmtiles-reader.git'
     spdxId = 'BSD 3-Clause'
 }
 
