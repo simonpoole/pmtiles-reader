@@ -57,6 +57,7 @@ public class ReaderTest {
             assertEquals(1, reader.getZoomOffset(1));
             assertEquals(5, reader.getZoomOffset(2));
             assertEquals(21, reader.getZoomOffset(3));
+            assertEquals(366503875925L, reader.getZoomOffset(20));
         } catch (IOException e) {
             fail(e.getMessage());
             e.printStackTrace();
@@ -76,7 +77,6 @@ public class ReaderTest {
             byte[] tile = reader.getTile(z, x, y);
             assertNotNull(tile);
             byte[] d = MessageDigest.getInstance("MD5").digest(tile);
-            System.out.println(toHex(d));
             assertArrayEquals(digest, d);
         } catch (IOException | NoSuchAlgorithmException e) {
             fail(e.getMessage());

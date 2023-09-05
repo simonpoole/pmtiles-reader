@@ -493,7 +493,7 @@ public class Reader implements AutoCloseable, Closeable {
         final int size = tileCount.size();
         if (size < z + 1) {
             for (int i = size; i < z + 1; i++) {
-                tileCount.add((1 << (i - 1)) * (1 << (i - 1)) + tileCount.get(i - 1));
+                tileCount.add((1L << (i - 1)) * (1L << (i - 1)) + tileCount.get(i - 1));
             }
         }
         return tileCount.get(z);
