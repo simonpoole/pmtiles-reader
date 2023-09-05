@@ -2,6 +2,7 @@
 # PMTiles Java Reader
 
 Small library to retrieve tiles from a PMTiles format file. The library attempts to be reasonably efficient and stay compatible with the Java runtimes back to Android 4.1 at the same time.
+See [PMTiles V3 specification](https://github.com/protomaps/PMTiles/blob/main/spec/v3/spec.md) for more information.
 
 
 ## Usage
