@@ -154,10 +154,12 @@ public class Reader implements AutoCloseable, Closeable {
      */
     private class Directory {
 
-        long[] ids;
-        long[] runLengths;
-        long[] lengths;
-        long[] offsets;
+        long[]         ids;
+        long[]         runLengths;
+        long[]         lengths;
+        long[]         offsets;
+        private byte[] cachedTile;
+        private long   cachedTileId = -1;
 
         /**
          * Read the directory contents from the input stream
@@ -174,7 +176,7 @@ public class Reader implements AutoCloseable, Closeable {
 
             int count = channel.read(dirBuffer, offset);
             if (count != length) {
-                throw new IOException("directory incomplete read " + count + " bytes of " + length); // NOSONAR
+                throw new IOException("Incomplete directory read " + count + " bytes of " + length); // NOSONAR
             }
             dirBuffer = Util.decompress(dirBuffer, compression);
 
@@ -225,8 +227,10 @@ public class Reader implements AutoCloseable, Closeable {
             int index = Arrays.binarySearch(ids, id);
             if (index >= 0) {
                 long runLength = runLengths[index];
-                if (runLength > 0) {
+                if (runLength == 1) {
                     return readTile(header, index);
+                } else if (runLength > 1) {
+                    return getCachedTile(header, id, index);
                 } else {
                     return findTileInLeaf(header, id, index);
                 }
@@ -237,8 +241,9 @@ public class Reader implements AutoCloseable, Closeable {
             if (prev >= 0) {
                 long runLength = runLengths[prev];
                 if (runLength > 0) {
-                    if (ids[prev] + runLength - 1 >= id) {
-                        return readTile(header, prev);
+                    final long prevId = ids[prev];
+                    if (prevId + runLength - 1 >= id) {
+                        return getCachedTile(header, prevId, prev);
                     }
                 } else {
                     return findTileInLeaf(header, id, prev);
@@ -249,11 +254,30 @@ public class Reader implements AutoCloseable, Closeable {
         }
 
         /**
+         * If we are getting a tile which is de-duplicated, aka in a range of a runlength > 1, cache it or retrieve it
+         * from cache
+         * 
+         * @param header the PMTiles header
+         * @param id the Hilbert index
+         * @param dirIndex which entry this is in this directory
+         * @return a "tile"
+         * @throws IOException
+         */
+        @NotNull
+        private byte[] getCachedTile(@NotNull Header header, long id, int dirIndex) throws IOException {
+            if (cachedTileId == id) {
+                return cachedTile;
+            }
+            cachedTile = readTile(header, dirIndex);
+            cachedTileId = id;
+            return cachedTile;
+        }
+
+        /**
          * Find a tile in a leaf directory
          * 
          * If the leaf directory hasn't been read yet, read and cache it
          *
-         * 
          * @param header the PMTiles header
          * @param id the Hilbert index
          * @param dirIndex which entry this is in this directory
@@ -281,9 +305,10 @@ public class Reader implements AutoCloseable, Closeable {
          * 
          * @param header the PMTiles header
          * @param dirIndex which entry this is in this directory
-         * @return a "tile" or null
+         * @return a "tile" o
          * @throws IOException if reading the leaf directory or the tile fails
          */
+        @NotNull
         private byte[] readTile(@NotNull Header header, int dirIndex) throws IOException {
             final long tileLength = lengths[dirIndex];
             if (tileLength > Integer.MAX_VALUE) {
@@ -292,7 +317,7 @@ public class Reader implements AutoCloseable, Closeable {
             ByteBuffer tileBuffer = ByteBuffer.allocate((int) tileLength);
             int count = channel.read(tileBuffer, header.tileDataOffset + offsets[dirIndex]);
             if (count != tileLength) {
-                throw new IOException("incomplete tile read " + count + " bytes of " + tileLength);
+                throw new IOException("Incomplete tile read " + count + " bytes of " + tileLength);
             }
             return tileBuffer.array();
         }

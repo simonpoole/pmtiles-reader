@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,6 +18,7 @@ public class ReaderTest {
     File testFile1;
     File testFile2;
     File testFile3;
+    File testFile4;
 
     @Before
     public void setup() {
@@ -24,6 +26,7 @@ public class ReaderTest {
         testFile1 = new File(classLoader.getResource("stamen_toner(raster)CC-BY+ODbL_z3.pmtiles").getFile());
         testFile2 = new File(classLoader.getResource("usgs-mt-whitney-8-15-webp-512.pmtiles").getFile());
         testFile3 = new File(classLoader.getResource("protomaps(vector)ODbL_firenze.pmtiles").getFile());
+        // testFile4 = new File(classLoader.getResource("overture-pois.pmtiles").getFile());
     }
 
     @Test
@@ -124,5 +127,38 @@ public class ReaderTest {
             fail(e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public void getAllTiles(@NotNull File file) {
+        try (Reader reader = new Reader(file)) {
+            double[] bounds = reader.getBounds();
+            System.out.println("zoom " + reader.getMinZoom() + " " + reader.getMaxZoom());
+            long tileCount = 0;
+            long start = System.currentTimeMillis();
+            for (int z = reader.getMinZoom(); z <= reader.getMaxZoom(); z++) {
+                int x1 = xTile(z, bounds[0]);
+                int x2 = xTile(z, bounds[2]);
+                int y1 = yTile(z, bounds[1]);
+                int y2 = yTile(z, bounds[3]);
+
+                for (int x = x1; x < x2; x++) {
+                    for (int y = y2; y < y1; y++) {
+                        reader.getTile(z, x, y);
+                        tileCount++;
+                    }
+                }
+            }
+            System.out.println("Elapsed time " + (System.currentTimeMillis() - start) + " for " + tileCount + " tiles");
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    private int xTile(int zoom, double lon) {
+        return (int) Math.floor((lon + 180) / 360 * (1 << zoom));
+    }
+
+    private int yTile(int zoom, double lat) {
+        return (int) Math.floor((1 - Math.log(Math.tan(Math.toRadians(lat)) + 1 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2 * (1 << zoom));
     }
 }
