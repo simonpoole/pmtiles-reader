@@ -41,7 +41,7 @@ Example:
     
 ## Including in your project
 
-You can either download the jar from github or add the following to your build.gradle
+Add the following to your build.gradle
 
 	...
 	    repositories {
