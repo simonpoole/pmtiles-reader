@@ -292,7 +292,6 @@ public class Reader implements AutoCloseable, Closeable {
                 final long leafId = ids[dirIndex];
                 Directory leaf = leafCache.get(leafId); // NOSONAR Android compatibility
                 if (leaf == null) {
-
                     leaf = new Directory();
                     leaf.read(channel, header.leafDirOffset + offsets[dirIndex], lengths[dirIndex], header.internalCompression);
                     leafCache.put(leafId, leaf);
