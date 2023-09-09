@@ -33,6 +33,7 @@ public class HttpUrlConnectionChannel extends UrlFileChannel {
             String eTag = conn.getHeaderField(ETAG_HEADER);
             if (eTag != null) {
                 if (savedETag != null && !eTag.equals(savedETag)) {
+                    savedETag = eTag;
                     throw new SourceChangedException();
                 }
                 savedETag = eTag;
