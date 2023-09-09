@@ -53,6 +53,6 @@ Add the following to your build.gradle
 	
 	dependencies {
 	    ...
-	    implementation 'ch.poole.geo.pmtiles-reader:Reader:0.3.4'
+	    implementation 'ch.poole.geo.pmtiles-reader:Reader:0.3.5'
 	    ...
 	}

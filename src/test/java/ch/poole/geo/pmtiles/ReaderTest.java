@@ -18,7 +18,6 @@ public class ReaderTest {
     File testFile1;
     File testFile2;
     File testFile3;
-    File testFile4;
 
     @Before
     public void setup() {
@@ -26,7 +25,6 @@ public class ReaderTest {
         testFile1 = new File(classLoader.getResource("stamen_toner(raster)CC-BY+ODbL_z3.pmtiles").getFile());
         testFile2 = new File(classLoader.getResource("usgs-mt-whitney-8-15-webp-512.pmtiles").getFile());
         testFile3 = new File(classLoader.getResource("protomaps(vector)ODbL_firenze.pmtiles").getFile());
-        // testFile4 = new File(classLoader.getResource("overture-pois.pmtiles").getFile());
     }
 
     @Test
@@ -43,7 +41,6 @@ public class ReaderTest {
             assertEquals(0, reader.getCenterZoom());
         } catch (IOException e) {
             fail(e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -63,7 +60,6 @@ public class ReaderTest {
             assertEquals(366503875925L, reader.getZoomOffset(20));
         } catch (IOException e) {
             fail(e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -83,7 +79,6 @@ public class ReaderTest {
             assertArrayEquals(digest, d);
         } catch (IOException | NoSuchAlgorithmException e) {
             fail(e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -128,9 +123,15 @@ public class ReaderTest {
             e.printStackTrace();
         }
     }
+    
+//    @Test
+//    public void performance() {
+//        getAllTiles(testFile4);
+//    }
 
     public void getAllTiles(@NotNull File file) {
         try (Reader reader = new Reader(file)) {
+            reader.setLeafDirectoryCacheSize(70);
             double[] bounds = reader.getBounds();
             System.out.println("zoom " + reader.getMinZoom() + " " + reader.getMaxZoom());
             long tileCount = 0;
