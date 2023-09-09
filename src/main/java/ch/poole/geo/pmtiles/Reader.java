@@ -171,6 +171,7 @@ public class Reader implements AutoCloseable, Closeable {
          * @throws IOException if reading fails
          */
         void read(@NotNull FileChannel channel, long offset, long length, byte compression) throws IOException {
+            cachedTileId = -1;
             ByteBuffer dirBuffer = ByteBuffer.allocate((int) length);
             dirBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
