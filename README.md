@@ -20,7 +20,7 @@ As caching all leaf directories (the root directory is always retained) can pote
     
 the default value is currently 20. If you have plenty of heap available increasing the value may improve performance a lot depending on the applications access patterns.
 
-To read from a remote resource via HTTP range requests you need to provide a FileChannel that provides a wrapper around your HTTP implementation, a sample based on HttpURLConnection is included. A similar approach can be used for other HTTP implementations or other network protocols.
+To read from a remote resource via HTTP range requests you need to provide a FileChannel that provides a wrapper around your HTTP implementation, a sample based on HttpURLConnection is included. A similar approach can be used for other HTTP implementations or other network protocols. [Vespucci 19.3](https://github.com/MarcusWolschon/osmeditor4android) utilizes a similar OkHttp based version.
 
 Example:
 
@@ -33,6 +33,10 @@ Example:
 
 - Directories cannot have more than Integer.MAX_VALUE entries and cannot be larger than the same both in compressed and de-compressed form, just as any other structures extracted from the file. 
 - Tiles cannot be larger (compressed) than Integer.MAX_VALUE
+- A substantial difference between accessing a conventional TMS/google/OSM style tile server and a remote PMTiles source is that the former requires essentially no local state, retrieving tiles
+from a PMTiles source however is only efficient if the header and directories are at least partially cached. With other words if the underlying source changes you will likely no
+longer be able to correctly access tiles without re-reading the meta data. The example HttpUrlConnectionChannel implements a simple mechanism based on the ETag header to detect this, but other 
+mechanisms could be implemented too. 
 - We only support GZip and Zstd compression of internal structures and metadata. Your application should catch UnsupportedOperationException to avoid crashing on files using something else. 
 - We do not attempt to de-compress tiles and leave that to the calling application
     
