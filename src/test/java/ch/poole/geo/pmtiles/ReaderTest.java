@@ -18,6 +18,7 @@ public class ReaderTest {
     File testFile1;
     File testFile2;
     File testFile3;
+    File testFile4;
 
     @Before
     public void setup() {
@@ -25,6 +26,7 @@ public class ReaderTest {
         testFile1 = new File(classLoader.getResource("stamen_toner(raster)CC-BY+ODbL_z3.pmtiles").getFile());
         testFile2 = new File(classLoader.getResource("usgs-mt-whitney-8-15-webp-512.pmtiles").getFile());
         testFile3 = new File(classLoader.getResource("protomaps(vector)ODbL_firenze.pmtiles").getFile());
+        testFile4 = new File(classLoader.getResource("leaf-dirs.pmtiles").getFile());
     }
 
     @Test
@@ -46,8 +48,8 @@ public class ReaderTest {
 
     @Test
     public void tile000() {
-        getAndCompareTile(0, 0, 0, new byte[] { (byte) 0x18, (byte) 0x97, (byte) 0x5d, (byte) 0xa8, (byte) 0x1e, (byte) 0x33, (byte) 0x28, (byte) 0x4b,
-                (byte) 0x08, (byte) 0x22, (byte) 0x4a, (byte) 0x66, (byte) 0x77, (byte) 0xb4, (byte) 0xe8, (byte) 0x09 });
+        getAndCompareTile(testFile1, 0, 0, 0, new byte[] { (byte) 0x18, (byte) 0x97, (byte) 0x5d, (byte) 0xa8, (byte) 0x1e, (byte) 0x33, (byte) 0x28,
+                (byte) 0x4b, (byte) 0x08, (byte) 0x22, (byte) 0x4a, (byte) 0x66, (byte) 0x77, (byte) 0xb4, (byte) 0xe8, (byte) 0x09 });
     }
 
     @Test
@@ -66,16 +68,18 @@ public class ReaderTest {
     /**
      * Retrieve a tile and check that it has the correct checksum
      * 
+     * @param file PMTiles file
      * @param z zoom
      * @param x x tile coord
      * @param y y tile coord
      * @param digest checksum
      */
-    private void getAndCompareTile(int z, int x, int y, byte[] digest) {
-        try (Reader reader = new Reader(testFile1)) {
+    private void getAndCompareTile(File file, int z, int x, int y, byte[] digest) {
+        try (Reader reader = new Reader(file)) {
             byte[] tile = reader.getTile(z, x, y);
             assertNotNull(tile);
             byte[] d = MessageDigest.getInstance("MD5").digest(tile);
+            System.out.println(z + " " + x + " " + y + " " + toHex(d));
             assertArrayEquals(digest, d);
         } catch (IOException | NoSuchAlgorithmException e) {
             fail(e.getMessage());
@@ -91,15 +95,15 @@ public class ReaderTest {
     }
 
     @Test
-    public void tile223() {
-        getAndCompareTile(2, 2, 3, new byte[] { (byte) 0x73, (byte) 0x43, (byte) 0xea, (byte) 0xd2, (byte) 0x54, (byte) 0xbb, (byte) 0x26, (byte) 0x6e,
-                (byte) 0x02, (byte) 0x9d, (byte) 0x9e, (byte) 0xb9, (byte) 0x5f, (byte) 0x04, (byte) 0x17, (byte) 0x86 });
+    public void tile_2_2_3() {
+        getAndCompareTile(testFile1, 2, 2, 3, new byte[] { (byte) 0x73, (byte) 0x43, (byte) 0xea, (byte) 0xd2, (byte) 0x54, (byte) 0xbb, (byte) 0x26,
+                (byte) 0x6e, (byte) 0x02, (byte) 0x9d, (byte) 0x9e, (byte) 0xb9, (byte) 0x5f, (byte) 0x04, (byte) 0x17, (byte) 0x86 });
     }
 
     @Test
-    public void tile383() {
-        getAndCompareTile(3, 8, 3, new byte[] { (byte) 0xc4, (byte) 0x25, (byte) 0xe2, (byte) 0x6c, (byte) 0x8d, (byte) 0x26, (byte) 0xdd, (byte) 0x48,
-                (byte) 0x71, (byte) 0x3f, (byte) 0xc4, (byte) 0x9e, (byte) 0xc1, (byte) 0xe7, (byte) 0xd6, (byte) 0xd2 });
+    public void tile_3_8_3() {
+        getAndCompareTile(testFile1, 3, 8, 3, new byte[] { (byte) 0xc4, (byte) 0x25, (byte) 0xe2, (byte) 0x6c, (byte) 0x8d, (byte) 0x26, (byte) 0xdd,
+                (byte) 0x48, (byte) 0x71, (byte) 0x3f, (byte) 0xc4, (byte) 0x9e, (byte) 0xc1, (byte) 0xe7, (byte) 0xd6, (byte) 0xd2 });
     }
 
     /**
@@ -107,10 +111,26 @@ public class ReaderTest {
      */
     @Test
     public void runlength() {
-        getAndCompareTile(3, 4, 7, new byte[] { (byte) 0x4f, (byte) 0xf4, (byte) 0xd1, (byte) 0x39, (byte) 0xef, (byte) 0xd3, (byte) 0x97, (byte) 0xfd,
-                (byte) 0xf4, (byte) 0x1f, (byte) 0x49, (byte) 0xce, (byte) 0xc1, (byte) 0xef, (byte) 0x23, (byte) 0x84 });
-        getAndCompareTile(3, 5, 7, new byte[] { (byte) 0x4f, (byte) 0xf4, (byte) 0xd1, (byte) 0x39, (byte) 0xef, (byte) 0xd3, (byte) 0x97, (byte) 0xfd,
-                (byte) 0xf4, (byte) 0x1f, (byte) 0x49, (byte) 0xce, (byte) 0xc1, (byte) 0xef, (byte) 0x23, (byte) 0x84 });
+        getAndCompareTile(testFile1, 3, 5, 7, new byte[] { (byte) 0x4f, (byte) 0xf4, (byte) 0xd1, (byte) 0x39, (byte) 0xef, (byte) 0xd3, (byte) 0x97,
+                (byte) 0xfd, (byte) 0xf4, (byte) 0x1f, (byte) 0x49, (byte) 0xce, (byte) 0xc1, (byte) 0xef, (byte) 0x23, (byte) 0x84 });
+        // higher hilbert id first so that cache gets exercised as the rl is just 2
+        try (Reader reader = new Reader(testFile1)) {
+            byte[] tile1 = reader.getTile(3, 5, 7);
+            assertNotNull(tile1);
+            byte[] tile2 = reader.getTile(3, 4, 7);
+            assertArrayEquals(tile1, tile2);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    /**
+     * This tile is indexed via a leaf directory
+     */
+    @Test
+    public void tile_15_17145_11469() {
+        getAndCompareTile(testFile4, 15, 17145, 11469, new byte[] { (byte) 0xa2, (byte) 0x87, (byte) 0xcc, (byte) 0x8f, (byte) 0x17, (byte) 0xa2, (byte) 0xdb,
+                (byte) 0x14, (byte) 0x54, (byte) 0x55, (byte) 0x8a, (byte) 0x15, (byte) 0x68, (byte) 0x52, (byte) 0x18, (byte) 0x41 });
     }
 
     @Test
@@ -123,11 +143,11 @@ public class ReaderTest {
             e.printStackTrace();
         }
     }
-    
-//    @Test
-//    public void performance() {
-//        getAllTiles(testFile4);
-//    }
+
+    // @Test
+    // public void performance() {
+    // getAllTiles(testFile4);
+    // }
 
     public void getAllTiles(@NotNull File file) {
         try (Reader reader = new Reader(file)) {
@@ -144,7 +164,7 @@ public class ReaderTest {
 
                 for (int x = x1; x < x2; x++) {
                     for (int y = y2; y < y1; y++) {
-                        reader.getTile(z, x, y);
+                        byte[] tile = reader.getTile(z, x, y);
                         tileCount++;
                     }
                 }
