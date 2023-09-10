@@ -192,16 +192,16 @@ public class Reader implements AutoCloseable, Closeable {
 
             long lastId = 0;
             for (int i = 0; i < entries; i++) {
-                int diff = VarInt.getVarInt(dirBuffer);
+                long diff = VarInt.getVarLong(dirBuffer);
                 long newId = lastId + diff;
                 ids[i] = newId;
                 lastId = newId;
             }
             for (int i = 0; i < entries; i++) {
-                runLengths[i] = VarInt.getVarInt(dirBuffer);
+                runLengths[i] = VarInt.getVarLong(dirBuffer);
             }
             for (int i = 0; i < entries; i++) {
-                lengths[i] = VarInt.getVarInt(dirBuffer);
+                lengths[i] = VarInt.getVarLong(dirBuffer);
             }
             for (int i = 0; i < entries; i++) {
                 long value = VarInt.getVarLong(dirBuffer);
