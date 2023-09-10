@@ -46,6 +46,9 @@ task replaceVersion {
         ant.replaceregexp(match:'ch\\.poole\\.geo\\.pmtiles-reader\\:Reader\\:([0-9\\.]+)', replace:"ch.poole.geo.pmtiles-reader:Reader:${project.ext.version}", flags:'g', byline:true) {
             fileset(dir: '.', includes: 'README.md')
         }
+        ant.replaceregexp(match:'ch\\.poole\\.geo\\.pmtiles-reader/Reader/([0-9\\.]+)', replace:"ch.poole.geo.pmtiles-reader/Reader/${project.ext.version}", flags:'g', byline:true) {
+            fileset(dir: '.', includes: 'README.md')
+        }
     }
 }
 build.dependsOn replaceVersion

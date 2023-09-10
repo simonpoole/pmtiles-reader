@@ -28,6 +28,8 @@ Example:
             byte[] tile = reader.getTile(19, 1, 1);
             ...  
         }
+        
+Detailed documentation can be found in the [JavaDoc](http://www.javadoc.io/doc/ch.poole.geo.pmtiles-reader/Reader/0.3.6).
 
 ## Limitations and other noteworthy points
 
