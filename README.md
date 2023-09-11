@@ -20,7 +20,7 @@ As caching all leaf directories (the root directory is always retained) can pote
     
 the default value is currently 20. If you have plenty of heap available increasing the value may improve performance a lot depending on the applications access patterns.
 
-To read from a remote resource via HTTP range requests you need to provide a FileChannel that provides a wrapper around your HTTP implementation, a sample based on HttpURLConnection is included. A similar approach can be used for other HTTP implementations or other network protocols. [Vespucci 19.3](https://github.com/MarcusWolschon/osmeditor4android) utilizes a similar OkHttp based version.
+To read from a remote resource via HTTP range requests you need to provide a FileChannel that provides a wrapper around your HTTP implementation, a sample based on HttpURLConnection is included. A similar approach can be used for other HTTP implementations or other network protocols. [Vespucci 19.3](https://github.com/MarcusWolschon/osmeditor4android/blob/master/src/main/java/de/blau/android/util/OkHttpFileChannel.java) utilizes a similar OkHttp based version.
 
 Example:
 
