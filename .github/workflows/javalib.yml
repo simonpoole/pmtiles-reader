@@ -40,7 +40,7 @@ jobs:
       run: ./gradlew jacocoTestReport
     - name: Upload Test Results
       if: ${{ always() }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
          name: Test output
          path: /home/runner/work/pmtiles-reader/pmtiles-reader/build/reports/tests/test/
