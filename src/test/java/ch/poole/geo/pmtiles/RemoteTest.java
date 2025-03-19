@@ -9,22 +9,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
-import java.nio.channels.FileChannel.MapMode;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
 
 public class RemoteTest {
 
@@ -114,8 +107,7 @@ public class RemoteTest {
 
     @Test
     public void checkUnimplemented() {
-        try {
-            FileChannel channel = new HttpUrlConnectionChannel(new URL(tileUrl));
+        try (FileChannel channel = new HttpUrlConnectionChannel(new URL(tileUrl))) {
             ByteBuffer buffer = ByteBuffer.allocate(10);
             try {
                 channel.read(new ByteBuffer[] { buffer }, 0, 0);
