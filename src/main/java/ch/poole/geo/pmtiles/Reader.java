@@ -345,11 +345,11 @@ public class Reader implements AutoCloseable, Closeable {
         }
     }
 
-    private final FileChannel         channel;
-    Header                            header    = new Header();
-    private Directory                 root      = new Directory();
-    private DirCache<Long, Directory> leafCache = new DirCache<>();
-    private List<Long>                tileCount = new ArrayList<>();
+    private final FileChannel               channel;
+    Header                                  header    = new Header();
+    private final Directory                 root      = new Directory();
+    private final DirCache<Long, Directory> leafCache = new DirCache<>();
+    private final List<Long>                tileCount = new ArrayList<>();
 
     /**
      * Construct a new Reader instance
@@ -384,6 +384,7 @@ public class Reader implements AutoCloseable, Closeable {
      * @throws IOException if reading fails
      */
     private void init(@NotNull FileChannel channel) throws IOException {
+        leafCache.clear();
         header.read(channel);
         root.read(channel, header.rootDirOffset, header.rootDirLength, header.internalCompression);
     }
