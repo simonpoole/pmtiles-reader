@@ -29,7 +29,7 @@ Example:
             ...  
         }
         
-Detailed documentation can be found in the [JavaDoc](http://www.javadoc.io/doc/ch.poole.geo.pmtiles-reader/Reader/0.3.6).
+Detailed documentation can be found in the [JavaDoc](http://www.javadoc.io/doc/ch.poole.geo.pmtiles-reader/Reader/0.3.7).
 
 ## Limitations and other noteworthy points
 
@@ -61,6 +61,6 @@ Add the following to your build.gradle
 	
 	dependencies {
 	    ...
-	    implementation 'ch.poole.geo.pmtiles-reader:Reader:0.3.6'
+	    implementation 'ch.poole.geo.pmtiles-reader:Reader:0.3.7'
 	    ...
 	}
